@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/carwash-manager/static/css/main.29fed662.css",
+    "main.css": "/carwash-manager/static/css/main.db265d7b.css",
     "main.js": "/carwash-manager/static/js/main.fed9895f.js",
     "index.html": "/carwash-manager/index.html",
-    "main.29fed662.css.map": "/carwash-manager/static/css/main.29fed662.css.map",
+    "main.db265d7b.css.map": "/carwash-manager/static/css/main.db265d7b.css.map",
     "main.fed9895f.js.map": "/carwash-manager/static/js/main.fed9895f.js.map"
   },
   "entrypoints": [
-    "static/css/main.29fed662.css",
+    "static/css/main.db265d7b.css",
     "static/js/main.fed9895f.js"
   ]
 }
