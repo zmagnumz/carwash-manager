@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import VehicleListScreen from './screens/VehicleListScreen';
 import AddVehicleScreen from './screens/AddVehicleScreen';
@@ -9,6 +9,7 @@ import ChemEditScreen from './screens/ChemEditScreen';
 import WashScreen from './screens/WashScreen';
 import CompleteScreen from './screens/CompleteScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import HistoryDetailScreen from './screens/HistoryDetailScreen';
 
 const SCREENS = {
   'sc-vehicle': VehicleListScreen,
@@ -20,6 +21,7 @@ const SCREENS = {
   'sc-wash': WashScreen,
   'sc-complete': CompleteScreen,
   'sc-settings': SettingsScreen,
+  'sc-history-detail': HistoryDetailScreen,
 };
 
 function Router() {
@@ -36,6 +38,17 @@ function Router() {
 }
 
 export default function App() {
+  useEffect(() => {
+    if (window.navigator.standalone !== true) return;
+    document.body.classList.add('pwa');
+    const setH = () => {
+      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+    };
+    setH();
+    window.addEventListener('resize', setH);
+    return () => window.removeEventListener('resize', setH);
+  }, []);
+
   return (
     <AppProvider>
       <Router />

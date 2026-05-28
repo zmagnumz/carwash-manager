@@ -15,8 +15,9 @@ export function AppProvider({ children }) {
   const [currentTab, setCurrentTab] = useState('home');
   const [wash, setWash] = useState(null);
   const [chemEditIndex, setChemEditIndex] = useState(null);
-  const [presetEditIndex, setPresetEditIndex] = useState(null); // null = new
+  const [presetEditIndex, setPresetEditIndex] = useState(null);
   const [presetEditBuiltinId, setPresetEditBuiltinId] = useState(null);
+  const [historyEditIndex, setHistoryEditIndex] = useState(null);
 
   const saveData = useCallback((newData) => {
     setData(newData);
@@ -53,6 +54,7 @@ export function AppProvider({ children }) {
       chemEditIndex, setChemEditIndex,
       presetEditIndex, setPresetEditIndex,
       presetEditBuiltinId, setPresetEditBuiltinId,
+      historyEditIndex, setHistoryEditIndex,
     }}>
       {children}
     </AppContext.Provider>

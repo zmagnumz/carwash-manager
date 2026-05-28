@@ -2,7 +2,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 
 export default function HomeTab() {
-  const { data, currentVehicle, go } = useApp();
+  const { data, currentVehicle, go, setHistoryEditIndex } = useApp();
   const v = data.vehicles[currentVehicle];
   if (!v) return null;
 
@@ -29,7 +29,7 @@ export default function HomeTab() {
       <div className="card" style={{ marginBottom: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ fontSize: 44 }}>{v.emoji || '🚗'}</div>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontSize: 17, fontWeight: 600 }}>{v.plate}</div>
             <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>{v.model || ''}</div>
             {lastPreset && (
@@ -38,6 +38,9 @@ export default function HomeTab() {
               </div>
             )}
           </div>
+          <button className="btn-icon" onClick={() => go('sc-vehicle')} aria-label="차량 변경" style={{ alignSelf: 'flex-start' }}>
+            <i className="ti ti-selector" />
+          </button>
         </div>
       </div>
       <div className="stat-grid">
@@ -58,7 +61,12 @@ export default function HomeTab() {
       {recent.length === 0 ? (
         <div style={{ fontSize: 13, color: 'var(--text3)', padding: '10px 0' }}>세차 기록이 없습니다</div>
       ) : recent.map((h, i) => (
-        <div key={i} className="history-item">
+        <div
+          key={i}
+          className="history-item"
+          style={{ cursor: 'pointer' }}
+          onClick={() => { setHistoryEditIndex(data.history.indexOf(h)); go('sc-history-detail'); }}
+        >
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--blue)', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 500 }}>{h.preset}</div>
@@ -66,8 +74,9 @@ export default function HomeTab() {
               {new Date(h.date).toLocaleDateString('ko-KR')}{h.locName ? ' · ' + h.locName : ''}
             </div>
           </div>
-          <div style={{ fontSize: 12, fontFamily: "'Courier New',monospace", color: 'var(--text2)' }}>
-            {Math.round(h.duration / 60)}분
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 12, fontFamily: "'Courier New',monospace", color: 'var(--text2)' }}>{Math.round(h.duration / 60)}분</span>
+            <i className="ti ti-chevron-right" style={{ fontSize: 13, color: 'var(--text3)' }} />
           </div>
         </div>
       ))}

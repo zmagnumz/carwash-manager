@@ -2,7 +2,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 
 export default function HistoryTab() {
-  const { data, currentVehicle } = useApp();
+  const { data, currentVehicle, go, setHistoryEditIndex } = useApp();
   const vHist = data.history.filter(h => h.vid === currentVehicle).reverse();
 
   if (vHist.length === 0) {
@@ -12,10 +12,18 @@ export default function HistoryTab() {
   return (
     <>
       {vHist.map((h, i) => (
-        <div key={i} className="card">
+        <div
+          key={i}
+          className="card"
+          style={{ cursor: 'pointer' }}
+          onClick={() => { setHistoryEditIndex(data.history.indexOf(h)); go('sc-history-detail'); }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{h.preset}</div>
-            <span className="badge badge-gray">{Math.round(h.duration / 60)}분</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="badge badge-gray">{Math.round(h.duration / 60)}분</span>
+              <i className="ti ti-chevron-right" style={{ fontSize: 14, color: 'var(--text3)' }} />
+            </div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--text2)' }}>
             {new Date(h.date).toLocaleDateString('ko-KR')}{h.locName ? ' · ' + h.locName : ''}

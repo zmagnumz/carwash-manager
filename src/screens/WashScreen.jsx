@@ -10,10 +10,13 @@ export default function WashScreen() {
   const wRef = useRef(null);
   const intervalRef = useRef(null);
   const lastTickRef = useRef(Date.now());
+  const stepRowRefs = useRef([]);
+  const prevStepRef = useRef(-1);
 
   useEffect(() => {
     if (!wash) return;
     wRef.current = { ...wash };
+    prevStepRef.current = -1;
     lastTickRef.current = Date.now();
     intervalRef.current = setInterval(() => {
       const w = wRef.current;
@@ -42,6 +45,17 @@ export default function WashScreen() {
 
     return () => clearInterval(intervalRef.current);
   }, [wash, beep, alarm5]);
+
+  // Auto-scroll to current step when it changes
+  useEffect(() => {
+    const w = wRef.current;
+    if (!w) return;
+    if (w.curStep !== prevStepRef.current) {
+      prevStepRef.current = w.curStep;
+      const el = stepRowRefs.current[w.curStep];
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 
   const togglePause = () => {
     wRef.current.paused = !wRef.current.paused;
@@ -87,6 +101,7 @@ export default function WashScreen() {
 
   return (
     <>
+      {/* 상단 컨트롤 */}
       <div className="topbar">
         <button className="btn-icon" onClick={confirmStop} aria-label="중단"><i className="ti ti-x" /></button>
         <span className="topbar-title">{w.preset.name}</span>
@@ -94,7 +109,9 @@ export default function WashScreen() {
           <i className={`ti ${w.paused ? 'ti-player-play' : 'ti-player-pause'}`} />
         </button>
       </div>
-      <div className="content">
+
+      {/* 고정 요약 영역 */}
+      <div style={{ flexShrink: 0, padding: '12px 16px', borderBottom: '0.5px solid var(--border)', background: 'var(--bg)' }}>
         {w.startOffset != null && Math.abs(w.startOffset) >= 60 && (
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -110,7 +127,7 @@ export default function WashScreen() {
           </div>
         )}
         {w.garageTotal > 0 && (
-          <div className={`garage-banner ${garageCls}`} style={{ marginBottom: 14 }}>
+          <div className={`garage-banner ${garageCls}`} style={{ marginBottom: 12 }}>
             <div>
               <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 2 }}>{w.locName || '개러지'}</div>
               <div className={`g-time ${garageCls}`}>
@@ -121,13 +138,15 @@ export default function WashScreen() {
             <i className="ti ti-building" style={{ fontSize: 24, color: 'var(--text3)' }} />
           </div>
         )}
-        <div style={{ marginBottom: 14 }}>
-          <StepTimelineBar steps={w.preset.steps} stepT={stepT} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text3)', marginTop: 5 }}>
-            <span>{done} / {total} 단계</span>
-            <span>{pct}%</span>
-          </div>
+        <StepTimelineBar steps={w.preset.steps} stepT={stepT} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text3)', marginTop: 5 }}>
+          <span>{done} / {total} 단계</span>
+          <span>{pct}%</span>
         </div>
+      </div>
+
+      {/* 스크롤 가능한 단계 목록 */}
+      <div className="content" style={{ paddingTop: 8 }}>
         {w.preset.steps.map((s, i) => {
           const t = stepT[i];
           const isDone = !t.running && t.elapsed > 0;
@@ -142,7 +161,12 @@ export default function WashScreen() {
           const checkCls = 'step-check' + (isDone ? ' done' : isActive && isOver ? ' over' : isActive ? ' active' : '');
           const nameCls = 'step-name-txt' + (!isDone && !isActive && !isNext ? ' inactive' : '') + (isOver ? ' over' : '');
           return (
-            <div key={i} className="step-row" style={isActive && isOver ? { background: 'var(--red-light)', borderRadius: 'var(--radius)', padding: '0 4px', margin: '0 -4px' } : {}}>
+            <div
+              key={i}
+              ref={el => stepRowRefs.current[i] = el}
+              className="step-row"
+              style={isActive && isOver ? { background: 'var(--red-light)', borderRadius: 'var(--radius)', padding: '0 4px', margin: '0 -4px' } : {}}
+            >
               <div className="step-main">
                 <div className={checkCls} onClick={() => completeStep(i)}>
                   {isDone && <i className="ti ti-check" style={{ fontSize: 13 }} />}
@@ -154,7 +178,9 @@ export default function WashScreen() {
                 </div>
                 <div className={timerCls}>{timerStr}</div>
               </div>
-              {(isActive || isNext) && s.chemId != null && <ChemPanel step={s} idx={i} isActive={isActive} isNext={isNext} isOver={isOver} chemicals={w.preset.chemicals || []} />}
+              {(isActive || isNext) && s.chemId != null && (
+                <ChemPanel step={s} idx={i} isActive={isActive} isNext={isNext} isOver={isOver} chemicals={w.preset.chemicals || []} />
+              )}
             </div>
           );
         })}
@@ -179,14 +205,13 @@ function StepTimelineBar({ steps, stepT }) {
           : isLow ? 'var(--red)'
           : isActive ? 'var(--blue)'
           : 'var(--blue-mid)';
-        const trackColor = isDone ? 'var(--bg3)' : 'var(--bg3)';
 
         return (
           <div
             key={i}
             style={{
               flex: s.min,
-              background: trackColor,
+              background: 'var(--bg3)',
               borderRadius: 5,
               overflow: 'hidden',
               position: 'relative',
