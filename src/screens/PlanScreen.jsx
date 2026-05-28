@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import TopBar from '../components/TopBar';
 import AutocompleteInput from '../components/AutocompleteInput';
-import TimeWheelPicker from '../components/TimeWheelPicker';
 import { PRESETS } from '../data/presets';
 
 function todayStr() {
@@ -102,31 +101,30 @@ export default function PlanScreen() {
           />
         </div>
 
-        <TimeWheelPicker
-          label="시작 시간"
-          hour={startH}
-          minute={startM}
-          onHourChange={setStartH}
-          onMinuteChange={setStartM}
-        />
-        <TimeWheelPicker
-          label="종료 시간"
-          hour={endH}
-          minute={endM}
-          onHourChange={setEndH}
-          onMinuteChange={setEndM}
-        />
-
-        {durMin > 0 && (
-          <div style={{ fontSize: 13, marginBottom: 4, textAlign: 'right', color: 'var(--text2)' }}>
-            예약 시간: {durMin >= 60 ? Math.floor(durMin / 60) + '시간 ' : ''}{durMin % 60}분
+        <div className="input-wrap">
+          <div className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>시간</span>
+            {durMin > 0 && <span style={{ fontWeight: 400, color: 'var(--text2)' }}>{durMin >= 60 ? Math.floor(durMin / 60) + '시간 ' : ''}{durMin % 60 > 0 ? durMin % 60 + '분' : ''}</span>}
+            {durMin < 0 && <span style={{ fontWeight: 400, color: 'var(--red)', fontSize: 11 }}>종료가 시작보다 앞</span>}
           </div>
-        )}
-        {durMin < 0 && (
-          <div style={{ fontSize: 13, marginBottom: 4, textAlign: 'right', color: 'var(--red)' }}>
-            종료 시간이 시작보다 앞입니다
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              className="input-field"
+              type="time"
+              value={`${String(startH).padStart(2,'0')}:${String(startM).padStart(2,'0')}`}
+              onChange={e => { const [h,m] = e.target.value.split(':'); setStartH(+h); setStartM(+m); }}
+              style={{ flex: 1, textAlign: 'center' }}
+            />
+            <i className="ti ti-arrow-right" style={{ color: 'var(--text3)', flexShrink: 0, fontSize: 14 }} />
+            <input
+              className="input-field"
+              type="time"
+              value={`${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`}
+              onChange={e => { const [h,m] = e.target.value.split(':'); setEndH(+h); setEndM(+m); }}
+              style={{ flex: 1, textAlign: 'center' }}
+            />
           </div>
-        )}
+        </div>
 
         <div className="divider" />
         <div className="section-title">프리셋 선택</div>
