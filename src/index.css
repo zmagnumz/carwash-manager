@@ -108,7 +108,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .rank-bar{height:4px;background:var(--blue-light);border-radius:2px;overflow:hidden;}
 .rank-fill{height:100%;background:var(--blue);border-radius:2px;}
 .rank-vol{font-size:13px;font-weight:600;color:var(--blue-dark);flex-shrink:0;min-width:48px;text-align:right;}
-.tab-bar{display:flex;border-top:0.5px solid var(--border);background:var(--bg);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);}
+.tab-bar{display:flex;border-top:0.5px solid var(--border);background:var(--bg);flex-shrink:0;}
+@media(display-mode:standalone){.tab-bar{padding-bottom:env(safe-area-inset-bottom);}}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 0;cursor:pointer;font-size:11px;color:var(--text3);gap:4px;background:none;border:none;transition:color 0.15s;}
 .tab-item.active{color:var(--blue);}
 .tab-item i{font-size:25px;}
