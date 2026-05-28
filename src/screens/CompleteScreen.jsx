@@ -10,10 +10,12 @@ export default function CompleteScreen() {
 
   const saveRecord = () => {
     const chemUsage = [];
-    wash.preset.steps.forEach((s) => {
+    wash.preset.steps.forEach((s, i) => {
       if (s.chemId == null) return;
       const chem = data.chemicals.find(c => c.id === s.chemId);
       if (!chem) return;
+      const ml = wash.stepChemMl?.[i] || 0;
+      if (ml > 0) chemUsage.push({ brand: chem.brand, product: chem.product, ml });
     });
     saveData({
       ...data,

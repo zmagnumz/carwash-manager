@@ -15,7 +15,7 @@ export default function WashScreen() {
 
   useEffect(() => {
     if (!wash) return;
-    wRef.current = { ...wash };
+    wRef.current = { ...wash, stepChemMl: {} };
     prevStepRef.current = -1;
     lastTickRef.current = Date.now();
     intervalRef.current = setInterval(() => {
@@ -179,7 +179,7 @@ export default function WashScreen() {
                 <div className={timerCls}>{timerStr}</div>
               </div>
               {(isActive || isNext) && s.chemId != null && (
-                <ChemPanel step={s} idx={i} isActive={isActive} isNext={isNext} isOver={isOver} chemicals={w.preset.chemicals || []} />
+                <ChemPanel step={s} idx={i} isActive={isActive} isNext={isNext} isOver={isOver} chemicals={w.preset.chemicals || []} onCalcChange={(i, ml) => { wRef.current.stepChemMl[i] = ml; }} />
               )}
             </div>
           );
@@ -244,15 +244,15 @@ function StepTimelineBar({ steps, stepT }) {
   );
 }
 
-function ChemPanel({ step, idx, isActive, isNext, isOver, chemicals }) {
+function ChemPanel({ step, idx, isActive, isNext, isOver, chemicals, onCalcChange }) {
   const { data } = useApp();
   const [calcC, setCalcC] = useState('');
   const [calcW, setCalcW] = useState('');
   const chem = data.chemicals.find(c => c.id === step.chemId);
   if (!chem) return null;
   const cls = 'chem-panel' + (isNext ? ' next' : isOver ? ' over' : '');
-  const handleC = (v) => { setCalcC(v); const c = parseFloat(v); if (!isNaN(c)) setCalcW(String(Math.round(c * (chem.dw / chem.dr)))); };
-  const handleW = (v) => { setCalcW(v); const w = parseFloat(v); if (!isNaN(w) && chem.dw !== 0) setCalcC(String(Math.round(w / (chem.dw / chem.dr)))); };
+  const handleC = (v) => { setCalcC(v); const c = parseFloat(v); if (!isNaN(c)) { setCalcW(String(Math.round(c * (chem.dw / chem.dr)))); onCalcChange?.(idx, c); } };
+  const handleW = (v) => { setCalcW(v); const w = parseFloat(v); if (!isNaN(w) && chem.dw !== 0) { const c = Math.round(w / (chem.dw / chem.dr)); setCalcC(String(c)); onCalcChange?.(idx, c); } };
   const total = () => { const c = parseFloat(calcC), w = parseFloat(calcW); return (!isNaN(c) && !isNaN(w)) ? '총 ' + (c + w) + 'ml' : ''; };
   return (
     <div className={cls}>
@@ -268,7 +268,7 @@ function ChemPanel({ step, idx, isActive, isNext, isOver, chemicals }) {
         <>
           <div className="dil-calc">
             <div className="dil-input-wrap"><div className="dil-label">케미컬 (ml)</div><input className="dil-input" type="number" placeholder="50" value={calcC} onChange={e => handleC(e.target.value)} /></div>
-            <div className="dil-input-wrap"><div className="dil-label">물 (ml)</div><input className="dil-input" type="number" placeholder={50 * chem.dw} value={calcW} onChange={e => handleW(e.target.value)} /></div>
+            <div className="dil-input-wrap"><div className="dil-label">물 (ml)</div><input className="dil-input" type="number" placeholder={Math.round(50 * chem.dw / chem.dr)} value={calcW} onChange={e => handleW(e.target.value)} /></div>
           </div>
           <div className="dil-total">{total()}</div>
         </>
