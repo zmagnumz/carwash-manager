@@ -41,7 +41,7 @@ export default function WashScreen() {
     }, 500);
 
     return () => clearInterval(intervalRef.current);
-  }, [wash]);
+  }, [wash, beep, alarm5]);
 
   const togglePause = () => {
     wRef.current.paused = !wRef.current.paused;

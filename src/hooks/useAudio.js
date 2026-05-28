@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 export function useAudio() {
   const actxRef = useRef(null);
@@ -11,7 +11,7 @@ export function useAudio() {
     return actxRef.current;
   };
 
-  const beep = (freq, dur, times, gap) => {
+  const beep = useCallback((freq, dur, times, gap) => {
     const ac = getAC();
     for (let i = 0; i < times; i++) {
       setTimeout(() => {
@@ -27,9 +27,9 @@ export function useAudio() {
         o.stop(ac.currentTime + dur);
       }, i * (dur * 1000 + gap));
     }
-  };
+  }, []);
 
-  const alarm5 = () => {
+  const alarm5 = useCallback(() => {
     const ac = getAC();
     const o = ac.createOscillator();
     const g = ac.createGain();
@@ -41,7 +41,7 @@ export function useAudio() {
     g.gain.linearRampToValueAtTime(0, ac.currentTime + 5);
     o.start(ac.currentTime);
     o.stop(ac.currentTime + 5);
-  };
+  }, []);
 
   return { beep, alarm5 };
 }
